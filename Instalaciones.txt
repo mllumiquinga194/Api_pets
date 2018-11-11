@@ -1,0 +1,10 @@
+npm install express --save que es un framework que nos permite hacer api rest sobre node.
+npm install bcrypt-nodejs --save nos permite encriptar contraseñas.
+npm install body-parser --save nos permite parsear todo lo que viene por post-get-etc. parsearlos a JSON y poder trabajar con objetos dentro del codigo y todo lo convierte en objeto.
+npm install connect-multiparty --save libreria que nos permite subir ficheros con node. utiliza el protocolo http para poder recibir ficheros por FILE, la variable goblal file.
+npm install jwt-simple --save para crear token.
+npm install moment --save la utilizamos junto con JWT.
+npm install mongoose --save para trabajar con las base de datos  mongo.
+npm install mongoose-pagination --save para utilizar un ejemplo de paginacion.
+npm install nodemon --save-dev para recargar el servidor cada vez qeu hagamos un cambio. solo en desarrollo mas no en produccion.
+npm install mongoose-unique-validator --save para validar las propiedades del modelo

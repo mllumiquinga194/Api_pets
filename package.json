@@ -1,0 +1,26 @@
+{
+  "name": "pets",
+  "version": "1.0.0",
+  "description": "API Rest Sistema de Mascotas",
+  "main": "index.js",
+  "scripts": {
+    "start": "nodemon index.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Marcos Llumiquinga",
+  "license": "ISC",
+  "dependencies": {
+    "bcrypt-nodejs": "0.0.3",
+    "body-parser": "^1.18.3",
+    "express": "^4.16.4",
+    "express-fileupload": "^1.0.0",
+    "jwt-simple": "^0.5.5",
+    "moment": "^2.22.2",
+    "mongoose": "^5.3.10",
+    "mongoose-pagination": "^1.0.0",
+    "mongoose-unique-validator": "^2.0.2"
+  },
+  "devDependencies": {
+    "nodemon": "^1.18.6"
+  }
+}
