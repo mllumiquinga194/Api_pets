@@ -40,7 +40,7 @@ let UsersSchema = new Schema({
     },
     estado: {
         type: Boolean,
-        default: false
+        default: true
     },
     sobre_mi: {
         type: String,

@@ -14,11 +14,13 @@
     "body-parser": "^1.18.3",
     "express": "^4.16.4",
     "express-fileupload": "^1.0.0",
+    "fs": "0.0.1-security",
     "jwt-simple": "^0.5.5",
     "moment": "^2.22.2",
     "mongoose": "^5.3.10",
     "mongoose-pagination": "^1.0.0",
-    "mongoose-unique-validator": "^2.0.2"
+    "mongoose-unique-validator": "^2.0.2",
+    "path": "^0.12.7"
   },
   "devDependencies": {
     "nodemon": "^1.18.6"

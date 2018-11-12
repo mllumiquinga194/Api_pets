@@ -19,16 +19,20 @@ let PetsSchema = new Schema({
     },
     estado: {
         type: Boolean,
-        default: false
+        default: true
     },
     descripcion: {
         type: String,
-        default: false
+        default: "Perrito lindo"
     },
+    duenio: {
+        type: Schema.Types.ObjectId,
+        ref: 'Users'
+    }
 });
 
 
-UsersSchema.plugin(uniqueValidator, {//para validar el nombre
+PetsSchema.plugin(uniqueValidator, {//para validar el nombre
     message: '{PATH} debe ser unico'
 });
 

@@ -7,6 +7,8 @@ var port = process.env.PORT || 3977;
 //para evitar el error:
 //(node:6568) DeprecationWarning: collection.ensureIndex is deprecated. Use createIndexes instead.
 mongoose.set('useCreateIndex', true);
+// (node:1016) DeprecationWarning: collection.findAndModify is deprecated. Use findOneAndUpdate, findOneAndReplace or findOneAndDelete instead.
+mongoose.set('useFindAndModify', false);
 
 mongoose.connect('mongodb://localhost:27017/pets', { useNewUrlParser: true }, (err, res) => {
     if(err){

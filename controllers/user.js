@@ -3,6 +3,8 @@
 var User = require('../models/user');
 var bcrypt = require('bcrypt-nodejs');
 var jwt = require('../services/jwt');
+var fs = require('fs');
+var path = require('path');
 
 function saveUser(req, res) {
 
@@ -12,8 +14,9 @@ function saveUser(req, res) {
     user.nombre = params.nombre;
     user.apellido = params.apellido;
     user.email = params.email;
-    user.img = 'null';
+    user.img = 'noneUser.jpg';
     user.role = 'USER_ROLE';
+
 
     if (params.password) {
         //encriptar password
@@ -153,12 +156,13 @@ function uploadImg(req, res) {
                 });
             }
 
-            User.findByIdAndUpdate(userId, { img: nombreArchivo }, { new: true }, (err, userUpdated) => {
+            User.findByIdAndUpdate(userId, { img: nombreArchivo }, (err, userUpdated) => {
                 if (!userUpdated) {
                     return res.status(404).send({
                         message: 'No se ha podido actulizar el usuario'
                     });
                 } else {
+                    borrarArchivo(userUpdated.img);
                     return res.status(200).send({
                         user: userUpdated
                     });
@@ -174,11 +178,133 @@ function uploadImg(req, res) {
     }
 }
 
+function borrarArchivo(nombreImagen) {
+
+    let pathImagen = path.resolve(__dirname, `../uploads/users/${nombreImagen}`);
+
+    if (fs.existsSync(pathImagen)) {
+        fs.unlinkSync(pathImagen);
+    }
+}
+
+function getImageFile(req, res) {
+
+    var imageFile = req.params.imageFile; //recogo el parametro que me va a llegar por url. que sera el nombre del fichero que yo quiero sacar por la base de datos
+
+    if (!imageFile) {
+        imageFile = 'noneUser.jpg';
+    }
+
+    var pathImagen = path.resolve(__dirname, `../uploads/users/${imageFile}`);
+
+    if (fs.existsSync(pathImagen)) {
+        return res.sendFile(pathImagen);
+    } else {
+        return res.status(200).send({
+            message: 'No existe la imagen...'
+        });
+    }
+
+}
+
+function deleteUser(req, res) {
+
+    let userId = req.params.id;
+    let estado = req.body.estado;
+
+    //este es un borrado logico, que lo que hace es cambiar el estado a false para que no sea mostrado. ya las condiciones estan dadas para que cuando tenga el estado false, no me lo muestre (busque) ni me lo cuente!!
+    let cambioEstado = {
+        estado
+    }
+
+    User.findByIdAndUpdate(userId, cambioEstado, { new: true }, (err, userBorradoLogico) => { //{new: true} es una opcion que le mando para especificar que me devuelva el usuario actualizado y no el usuario sin actualizar
+        if (err) {
+            return res.status(400).json({
+                ok: false,
+                err
+            });
+        } else {
+            if (!userBorradoLogico) {
+                res.json({
+                    ok: false,
+                    message: 'No existe el usuario'
+                });
+            } else {
+                res.json({
+                    ok: true,
+                    message: 'cambio de estado',
+                    usuario: userBorradoLogico
+                });
+            }
+        }
+    });
+
+    //este borrado es fisilo, la cual si elimina directamente de la base de datos
+    // Usuario.findByIdAndRemove(id, (err, usuarioBorrado) => {
+    //     if (err) {
+    //         return res.status(400).json({
+    //             ok: false,
+    //             err
+    //         });
+    //     }else {
+    //         if(!usuarioBorrado){
+    //             res.json({
+    //                 ok: false,
+    //                 message: 'No existe el usuario'
+    //             });
+    //         }else {
+
+    //             res.json({
+    //                 ok: true,
+    //                 usuario: usuarioBorrado
+    //             });
+    //         }
+    //     }
+    // });
+}
+
+//req lo que va a recibir en la peticion y res lo que va a devolver
+function getUsers(req, res) {
+
+    var userId = req.params.id;
+
+    if(!userId){
+        //sacar todos los usuarios de la base de datos
+        var find = User.find({estado: true}).sort('name');
+    }else{
+        //sacar un usuario nada mas.
+        var find = User.find({
+            _id: userId
+        }).sort('name');
+    }
+
+    find.exec((err, users) => {
+        if(err){
+            return res.status(500).send({
+                err,
+                message: 'Error en la peticion'
+            });
+        }else{
+            if(!users){
+                return res.status(404).send({
+                    message: 'No hay usuarios...'
+                });
+            }else{
+                return res.status(200).send({
+                    users
+                });
+            }
+        }
+    });
+}
+
 
 module.exports = {
-    pruebas,
     saveUser,
     loginUser,
     updateUser,
-    uploadImg
+    uploadImg,
+    getImageFile,
+    deleteUser,
+    getUsers
 };

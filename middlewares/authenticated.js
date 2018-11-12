@@ -33,3 +33,19 @@ exports.ensureAuth = function (req, res, next) {
 
     next(); //para salir del middleware
 };
+
+exports.verificaAdmin_Role = (req, res, next) => {
+    let user = req.user;
+    
+    if (user.role === 'ADMIN_ROLE'){
+        next();
+    }else{
+        return res.json({//401 error de no autorizacion
+            ok: false,
+            err: {
+                message: 'El usuario no es administrador'
+            }
+        });
+    }
+
+};

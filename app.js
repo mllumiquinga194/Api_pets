@@ -10,6 +10,7 @@ var app = express();
 
 //cargar rutas
 var user_routes = require('./routes/user');
+var pet_routes = require('./routes/pet');
 
 //Configurar body-parser
 
@@ -21,6 +22,7 @@ app.use(bodyParser.json());// Convertir a objetos JSON los datos que llegan por 
 //Carga de rutas BASE
 
 app.use('/api', user_routes); //para crear especie de middleware
+app.use('/api', pet_routes); //para crear especie de middleware
 
 
 module.exports = app; //Exportamos nuestro modulo para poder utilizar express dentro de otros ficheros que incluyan nuestro APP.
