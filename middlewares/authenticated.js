@@ -1,41 +1,29 @@
 'use strict'
 
-var jwt = require('jwt-simple');
-var moment = require('moment');
-var secret = 'clave_secreta_curso';
+const jwt = require('jsonwebtoken');
 
 exports.ensureAuth = function (req, res, next) {
 
-    if (!req.headers.authorization) {
-        return res.status(403).send({
-            message: 'La peticion no tiene la cabecera de Autenticación'
-        });
-    }
-
-    //elimino las comillas simples o dobles que pueda traer el token de autenticacion y las reemplazo por nada ''.
-    var token = req.headers.authorization.replace(/['"]+/g, '');
-
-    try {
-        var payload = jwt.decode(token, secret);
-
-        if ( payload.exp <= moment().unix() ) {// Si la fecha de expiracion del token es menor a la fecha actual,
-            return res.status(401).send({
-                message: 'El token ha expirado'
+    let token = req.get('Authorization')//de esta forma puedo obtener los headers.. asi lo hago por via URL.
+    //req.headers.authorization asi puedo hacerlo cuando es enviado en los headers desde el cliente al servidor
+    jwt.verify(token, process.env.SEED, (err, decoded) => { //verifico si el token es valido y recuperar la informacion del token. toda la informacion esta en la respuesta del callback, en este caso en decoded
+        
+        if (err) {
+            return res.status(401).json({//401 error de no autorizacion
+                ok: false,
+                err
             });
         }
-    } catch (ex) {
-        return res.status(404).send({
-            message: 'Token no valido'
-        });
-    }
-    //le vamos añadir una propiedad user, al objeto req. ahora vamos a tener disponible dentro de cada metodo que utilice este middleware un objeto user con todos los datos del usuario logeado o identificado.
-    req.user = payload;
-
-    next(); //para salir del middleware
+        req.user = decoded.payload; //req.user va a ser recibido en la funcion donde aplico el middlware
+        console.log('TOKEN', token);
+        console.log('PAYLOAD', decoded.payload);
+        console.log('SEED', process.env.SEED);
+        next();
+    });
 };
 
 exports.verificaAdmin_Role = (req, res, next) => {
-    let user = req.user;
+    let user = req.user;    
     
     if (user.role === 'ADMIN_ROLE'){
         next();

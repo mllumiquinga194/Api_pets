@@ -2,22 +2,30 @@
 // Vamos a cargar la libreria de Express y Body-parser. vamos a llamar metodos de expres, vamos a cargar ficheros de rutas, vamos a configurar cabeceras, configurar body-parser.
 'use strict'
 
-var express = require('express');
-var bodyParser = require('body-parser');
+const express = require('express');
+const bodyParser = require('body-parser');
 
 
-var app = express();
+const app = express();
 
 //cargar rutas
-var user_routes = require('./routes/user');
-var pet_routes = require('./routes/pet');
+const user_routes = require('./routes/user');
+const pet_routes = require('./routes/pet');
 
 //Configurar body-parser
 
 app.use(bodyParser.urlencoded({extended:false}));// Necesario para que body parser funcione
 app.use(bodyParser.json());// Convertir a objetos JSON los datos que llegan por peticiones HTTP.
 
-//Configurar cabeceras HTTP
+//Configurar cabeceras HTTP y cors
+
+app.use((req, res, next) => {
+    res.header('Access-Control-Allow-Origin', '*');
+    res.header('Access-Control-Allow-Headers', 'Authorization, X-API-KEY, Origin, X-Requested-With, Content-Type, Accept, Access-Control-Allow-Request-Method');
+    res.header('Access-Control-Allow-Methods', 'GET, POST, OPTIONS, PUT, DELETE');
+    res.header('Allow', 'GET, POST, OPTIONS, PUT, DELETE');
+    next();
+});
 
 //Carga de rutas BASE
 

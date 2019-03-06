@@ -25,6 +25,10 @@ let PetsSchema = new Schema({
         type: String,
         default: "Perrito lindo"
     },
+    edad: {
+        type: String,
+        required: false
+    },
     duenio: {
         type: Schema.Types.ObjectId,
         ref: 'Users'

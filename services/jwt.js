@@ -1,8 +1,6 @@
 'use strict'
 
-var jwt = require('jwt-simple');
-var moment = require('moment');
-var secret = 'clave_secreta_curso';
+const jwt = require('jsonwebtoken');
 
 exports.createToken = function (user) {
     var payload = {
@@ -11,10 +9,12 @@ exports.createToken = function (user) {
         apellido: user.apellido,
         email: user.email,
         role: user.role,
-        img: user.img,
-        iat: moment().unix(),
-        exp: moment().add(30, 'days').unix
+        img: user.img
     };
 
-    return jwt.encode(payload, secret);
+    return jwt.sign(
+        { payload },
+        process.env.SEED,
+        { expiresIn: process.env.CADUCIDAD_TOKEN }
+    );
 };

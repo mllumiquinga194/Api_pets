@@ -1,8 +1,9 @@
 'use strict'
 
 var User = require('../models/user');
-var bcrypt = require('bcrypt-nodejs');
-var jwt = require('../services/jwt');
+const bcrypt = require('bcrypt');
+// const jwt = require('jsonwebtoken');
+const jwt = require('../services/jwt');
 var fs = require('fs');
 var path = require('path');
 
@@ -13,42 +14,42 @@ function saveUser(req, res) {
 
     user.nombre = params.nombre;
     user.apellido = params.apellido;
-    user.email = params.email;
+    user.email = params.email.toLowerCase().replace(/ /g, "");
+    user.tlf = params.tlf;
+    user.state = params.state;
+    user.ciudad = params.ciudad;
     user.img = 'noneUser.jpg';
     user.role = 'USER_ROLE';
 
-
     if (params.password) {
         //encriptar password
-        bcrypt.hash(params.password, null, null, function (err, hash) {
-            user.password = hash;
-            if (user.nombre != null && user.apellido != null && user.email != null) {
-                //Guardar usuario
-                user.save((err, userStored) => {
-                    if (err) {
-                        return res.status(500).send({
-                            err,
-                            message: 'Error al guardar el usuario'
+        user.password = bcrypt.hashSync(params.password, 10);
+        if (user.nombre != null && user.apellido != null && user.email != null) {
+            //Guardar usuario
+            user.save( {new : true}, (err, userStored) => {
+                if (err) {
+                    return res.status(500).send({
+                        err,
+                        message: 'Error al guardar el usuario'
+                    });
+                } else {
+                    if (!userStored) {
+                        return res.status(404).send({
+                            message: 'No se ha guardado el usuario'
                         });
                     } else {
-                        if (!userStored) {
-                            return res.status(404).send({
-                                message: 'No se ha guardado el usuario'
-                            });
-                        } else {
-                            return res.status(200).send({
-                                //ACUERDATE QUE TIENES MODIFICADO EL MODELO PARA QUE NO DEVUELVA LA PASSWORD
-                                user: userStored
-                            });
-                        }
+                        return res.status(200).send({
+                            //ACUERDATE QUE TIENES MODIFICADO EL MODELO PARA QUE NO DEVUELVA LA PASSWORD
+                            user: userStored,
+                        });
                     }
-                });
-            } else {
-                return res.status(200).send({
-                    message: 'Rellena todos los campos'
-                });
-            }
-        });
+                }
+            });
+        } else {
+            return res.status(200).send({
+                message: 'Rellena todos los campos'
+            });
+        }
     } else {
         return res.status(500).send({
             message: 'Introduce la contraseña'
@@ -68,32 +69,25 @@ function loginUser(req, res) {
                 err,
                 message: 'Error en la peticion'
             });
+        }
+        if (!user) {
+            return res.status(404).send({
+                message: 'El usuario no existe'
+            });
         } else {
-            if (!user) {
-                return res.status(404).send({
-                    message: 'El usuario no existe'
+            //Comprobar la contraseña
+            if (!bcrypt.compareSync(password, user.password)) {
+                return res.status(400).json({
+                    ok: false,
+                    err: {
+                        message: 'Usuario o (Contraseña) Incorrecto'
+                    }
                 });
             } else {
-                //Comprobar la contraseña
-                bcrypt.compare(password, user.password, function (err, check) {
-                    if (check) {
-                        //Devolver los datos del usuario logeado
-                        if (params.gethash) {
-                            //devolver un TOKEN DE JWT
-                            return res.status(200).send({
-                                token: jwt.createToken(user)
-                            });
-                        } else {
-                            return res.status(200).send({
-                                //ACUERDATE QUE TIENES MODIFICADO EL MODELO PARA QUE NO DEVUELVA LA PASSWORD
-                                user
-                            });
-                        }
-                    } else {
-                        return res.status(404).send({
-                            message: 'El usuario no ha no podido logearse'
-                        });
-                    }
+                return res.json({
+                    ok: true,
+                    usuario: params,
+                    token: jwt.createToken(user)
                 });
             }
         }
@@ -156,7 +150,7 @@ function uploadImg(req, res) {
                 });
             }
 
-            User.findByIdAndUpdate(userId, { img: nombreArchivo }, (err, userUpdated) => {
+            User.findByIdAndUpdate(userId, { img: nombreArchivo, new: true }, (err, userUpdated) => {
                 if (!userUpdated) {
                     return res.status(404).send({
                         message: 'No se ha podido actulizar el usuario'
@@ -268,10 +262,10 @@ function getUsers(req, res) {
 
     var userId = req.params.id;
 
-    if(!userId){
+    if (!userId) {
         //sacar todos los usuarios de la base de datos
-        var find = User.find({estado: true}).sort('name');
-    }else{
+        var find = User.find({ estado: true }).sort('name');
+    } else {
         //sacar un usuario nada mas.
         var find = User.find({
             _id: userId
@@ -279,17 +273,17 @@ function getUsers(req, res) {
     }
 
     find.exec((err, users) => {
-        if(err){
+        if (err) {
             return res.status(500).send({
                 err,
                 message: 'Error en la peticion'
             });
-        }else{
-            if(!users){
+        } else {
+            if (!users) {
                 return res.status(404).send({
                     message: 'No hay usuarios...'
                 });
-            }else{
+            } else {
                 return res.status(200).send({
                     users
                 });

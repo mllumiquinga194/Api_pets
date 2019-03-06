@@ -22,12 +22,17 @@ let UsersSchema = new Schema({
     },
     email: {
         type: String,
+        trim: true,
         unique: true,
         required: [true, 'El email es necesario']
     },
     password: {
         type: String,
         required: [true, 'La contraseña es obligatoria']
+    },
+    tlf: {
+        type: String,
+        required: false
     },
     img: {
         type: String,
@@ -46,6 +51,22 @@ let UsersSchema = new Schema({
         type: String,
         default: "Sobre Mi"
     },
+    state: {
+        type: String,
+        default: "Bolivar"
+    },
+    ciudad: {
+        type: String,
+        default: "San Félix"
+    },
+    google: {
+        type: Boolean,
+        default: false
+    },
+    creado: {
+        type: Date,
+        default: Date.now
+    }
 });
 
 //para modificar el objeto a la hora de imprimir para que no me muestre la password de ninguna manera modificando el metodo TOJSON

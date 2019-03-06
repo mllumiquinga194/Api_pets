@@ -12,6 +12,7 @@ function savePets(req, res){
         nombre: params.nombre,
         img: 'nonePet.jpg',
         descripcion: params.descripcion,
+        edad: params.edad,
         duenio: params.duenio
     });
 

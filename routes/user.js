@@ -15,6 +15,6 @@ api.put('/update-user/:id', md_auth.ensureAuth, UserController.updateUser);
 api.post('/upload-image-user/:id', [md_auth.ensureAuth, md_upload], UserController.uploadImg);
 api.get('/get-image-user/:imageFile?', UserController.getImageFile);
 api.delete('/delete-user/:id', [md_auth.ensureAuth, md_auth.verificaAdmin_Role], UserController.deleteUser);
-api.get('/get-users/:id?', md_auth.ensureAuth, UserController.getUsers);
+api.get('/get-users/:id?', [md_auth.ensureAuth, md_auth.verificaAdmin_Role], UserController.getUsers);
 
 module.exports = api;
